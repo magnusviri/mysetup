@@ -13,7 +13,7 @@ if [[ "$uname" == "Darwin" ]]; then
 	if [ ! -e "$HOME/.env" ]; then
 		# First time
 		echo "Please install Xcode tools when asked"
-		git
+		git  --version
 		git clone https://github.com/magnusviri/dotfiles.git
 		ditto dotfiles .
 		rm -r dotfiles
