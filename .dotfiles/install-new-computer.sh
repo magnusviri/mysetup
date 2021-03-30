@@ -33,9 +33,18 @@ if [ "$COMPUTER_TYPE" == "" ]; then
 	echo "Please set COMPUTER_TYPE in ~/.env"
 	exit 1
 fi
+if [ "$COMPUTER_TYPE" != "Work" -a "$COMPUTER_TYPE" != "Personal" ]; then
+	echo "COMPUTER_TYPE in ~/.env must be one of: Work|Personal"
+	exit 1
+fi
 
 if [ "$HARDWARE_TYPE" == "" ]; then
 	echo "Please set HARDWARE_TYPE in ~/.env"
+	exit 1
+fi
+
+if [ "$HARDWARE_TYPE" != "BareMetal" -s "$HARDWARE_TYPE" != "VM" ]; then
+	echo "HARDWARE_TYPE in ~/.env must be one of: BareMetal|VM"
 	exit 1
 fi
 
@@ -60,10 +69,10 @@ fi
 if [[ "$UNAME" == "Darwin" ]]; then
 
 	echo "scutil --set ComputerName \"$COMPUTER_NAME\""
-	scutil --set ComputerName "$COMPUTER_NAME"
+	sudo scutil --set ComputerName "$COMPUTER_NAME"
 
 	echo "scutil --set LocalHostName \"$COMPUTER_NAME\""
-	scutil --set LocalHostName "$COMPUTER_NAME"
+	sudo scutil --set LocalHostName "$COMPUTER_NAME"
 
 	# Download mak.py
 	if [ ! -e /usr/local/bin/mak.py ]; then
@@ -80,248 +89,241 @@ if [[ "$UNAME" == "Darwin" ]]; then
 		/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
 	fi
 
-	if [[ "$COMPUTER_TYPE" == "WorkMac" ]]; then
+	if [[ "$COMPUTER_TYPE" == "Work" ]]; then
 
-		# Download nvm
-		if [ ! -e "$HOME/.nvm" ]; then
-			echo "Installing nvm"
-			curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.37.2/install.sh | bash
+		if [ "$HARDWARE_TYPE" == "BareMetal" ]; then
+
+
+			# Download nvm
+			if [ ! -e "$HOME/.nvm" ]; then
+				echo "Installing nvm"
+				curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.37.2/install.sh | bash
+			fi
+
+			# Download svg2icns
+			if [ ! -e /usr/local/bin/svg2icns ]; then
+				echo "Installing svg2icns"
+				curl -o /usr/local/bin/svg2icns https://raw.githubusercontent.com/magnusviri/svg2icns/main/svg2icns
+				chmod 755 /usr/local/bin/svg2icns
+			fi
+
+			brew_formulae='
+				tap "homebrew/bundle"
+				tap "homebrew/cask"
+				tap "homebrew/core"
+
+				brew "angular-cli"
+				brew "ansible"
+				brew "asciinema"
+				brew "bat"
+				brew "catimg"
+				brew "ffmpeg"
+				brew "glances" # top, disk io, net, etc
+				brew "htop"
+				brew "httpie" # a user-friendly command-line HTTP client for the API era. https://httpie.org/
+				brew "imagemagick"
+				brew "lolcat"
+				brew "lua"
+				brew "mas"
+				brew "micro"
+				brew "neofetch" # system_profiler like
+				brew "nnn" # File browser
+				brew "prettier"
+				brew "prettyping"
+				brew "python3"
+				brew "s3cmd"
+				brew "socat"
+				brew "svg2png"
+				brew "telnet"
+				brew "tldr"
+				brew "tmux"
+				brew "webp"
+				brew "wget"
+				brew "whalebrew"
+				brew "wumpus"
+				brew "youtube-dl"
+				brew "zsh"
+
+				cask "anaconda"
+				cask "arq"
+				cask "bbedit"
+				cask "brave-browser"
+				cask "cord"
+				cask "docker"
+				cask "dropbox"
+				cask "firefox"
+				cask "go2shell"
+				cask "grandperspective"
+				cask "iterm2"
+				cask "microsoft-office"
+				cask "microsoft-teams"
+				cask "mountain-duck"
+				cask "paragon-extfs"
+				cask "suspicious-package"
+				cask "textadept"
+				cask "vagrant"
+				cask "virtualbox"
+				cask "vlc"
+				cask "vmware-fusion"
+				cask "vscodium"
+				cask "wireshark"
+				cask "xquartz"
+				cask "zenmap"
+				cask "zoom"
+
+				mas "1Password 7", id: 1333542190
+				mas "com.alice.mac.GetPlainText", id: 508368068
+				mas "Keynote", id: 409183694
+				mas "Numbers", id: 409203825
+				mas "Remote Desktop", id: 409907375
+				mas "Slack", id: 803453959
+				mas "The Unarchiver", id: 425424353
+				mas "VOX", id: 461369673
+				mas "Xcode", id: 497799835
+			'
+# 				brew "autoconf" # for radmind
+# 				brew "duti"
+# 				brew "gifsicle" # Manipulate GIFs from terminal
+# 				brew "gnu-typist" # Term typing tutor
+# 				brew "jq" # like sed for JSON datahttps://stedolan.github.io/jq/
+# 				brew "klavaro" # GUI typing tutor
+# 				brew "librsvg"
+# 				brew "mariadb"
+# 				brew "midnight-commander" # Terminal Finder
+# 				brew "packer"
+# 				brew "speedtest-cli"
+# 				brew "tesseract" #OCR software
+# 				brew "tree" # displays directories as trees
+
+# Adobe CC 2019
+# Anaconda3
+# Arduino
+# BoxDrive
+# Carbon Copy Cloner
+# GrandPerspective
+# HP Printer Drivers
+# iMovie
+# Keyspan
+# LibreOffice
+# MeshLab
+# Microsoft Office 2019
+# Microsoft Remote Desktop
+# Novabench
+# Pacifist
+# Pages
+# QuickTime 7
+# Radmind
+# Skype
+# SoundFlower
+# Sublime Text
+# Suspicious Package
+# Thunderbird
+# TNEFs Enough
+# VMware Tools
+# XMenu
+
 		fi
+		if [ "$HARDWARE_TYPE" == "VM" ]; then
+			brew_formulae='
+				tap "homebrew/bundle"
+				tap "homebrew/cask"
+				tap "homebrew/core"
 
-		# Download svg2icns
-		if [ ! -e /usr/local/bin/svg2icns ]; then
-			echo "Installing svg2icns"
-			curl -o /usr/local/bin/svg2icns https://raw.githubusercontent.com/magnusviri/svg2icns/main/svg2icns
-			chmod 755 /usr/local/bin/svg2icns
+				brew "ansible"
+				brew "micro"
+				brew "python3"
+				brew "s3cmd"
+				brew "zsh"
+
+				cask "brave-browser"
+				cask "grandperspective"
+			'
 		fi
-
-		echo "Running Homebrew"
-		brew_formulae='
-			tap "homebrew/bundle"
-			tap "homebrew/cask"
-			tap "homebrew/core"
-
-			brew "asciinema"
-			brew "bat"
-			brew "catimg"
-			brew "ffmpeg"
-			brew "glances" # top, disk io, net, etc
-			brew "htop"
-			brew "httpie" # a user-friendly command-line HTTP client for the API era. https://httpie.org/
-			brew "imagemagick"
-			brew "lolcat"
-			brew "lua"
-			brew "mas"
-			brew "micro"
-			brew "neofetch" # system_profiler like
-			brew "nnn" # File browser
-			brew "prettier"
-			brew "prettyping"
-			brew "python3"
-			brew "socat"
-			brew "svg2png"
-			brew "telnet"
-			brew "tldr"
-			brew "tmux"
-			brew "webp"
-			brew "wget"
-			brew "whalebrew"
-			brew "wumpus"
-			brew "youtube-dl"
-			brew "zsh"
-# 			brew "autoconf" # for radmind
-# 			brew "duti"
-# 			brew "gifsicle" # Manipulate GIFs from terminal
-# 			brew "gnu-typist" # Term typing tutor
-# 			brew "jq" # like sed for JSON datahttps://stedolan.github.io/jq/
-# 			brew "klavaro" # GUI typing tutor
-# 			brew "librsvg"
-# 			brew "mariadb"
-# 			brew "midnight-commander" # Terminal Finder
-# 			brew "packer"
-# 			brew "speedtest-cli"
-# 			brew "tesseract" #OCR software
-# 			brew "tree" # displays directories as trees
-			cask "arq"
-			cask "bbedit"
-			cask "brave-browser"
-			cask "cord"
-			cask "docker"
-			cask "dropbox"
-			cask "firefox"
-			cask "go2shell"
-			cask "grandperspective"
-			cask "iterm2"
-			cask "suspicious-package"
-			cask "textadept"
-			cask "vagrant"
-			cask "virtualbox"
-			cask "vlc"
-			cask "wireshark"
-			cask "xquartz"
-			cask "zenmap"
-			cask "zoom"
-			mas "com.alice.mac.GetPlainText", id: 508368068
-			mas "Numbers", id: 409203825
-			mas "Slack", id: 803453959
-			mas "The Unarchiver", id: 425424353
-			mas "VOX", id: 461369673
-			mas "Xcode", id: 497799835
-
-# Work only
-			cask "anaconda"
-			brew "angular-cli"
-			brew "ansible"
-			brew "s3cmd"
-			cask "microsoft-office"
-			cask "microsoft-teams"
-			cask "mountain-duck"
-			cask "paragon-extfs"
-			cask "vscodium"
-			mas "1Password 7", id: 1333542190
-			mas "Keynote", id: 409183694
-			mas "Remote Desktop", id: 409907375
-
-# Personal only
-			brew "minetest"
-			cask "blender"
-			cask "freeorion"
-			cask "musescore"
-			mas "GarageBand", id: 682658836
-		'
-# If 10.15
-#	cask "vmware-fusion"
-# Box, Pacifist
-#
-# 	'Install Anaconda3' => 							{'student'=>1, 'staff'=>0, 'server'=>0, 'james'=>1},
-# 	'Install Arduino' => 							{'student'=>1, 'staff'=>0, 'server'=>0, 'james'=>1},
-# 	'Install CoRD' => 								{'student'=>1, 'staff'=>0, 'server'=>0, 'james'=>1},
-# 	'Install GarageBand' => 						{'student'=>1, 'staff'=>0, 'server'=>0, 'james'=>1},
-# 	'Install iMovie' => 							{'student'=>1, 'staff'=>0, 'server'=>0, 'james'=>1},
-# 	'Install Keynote' => 							{'student'=>1, 'staff'=>0, 'server'=>0, 'james'=>1},
-# 	'Install Keyspan' => 							{'student'=>0, 'staff'=>0, 'server'=>0, 'james'=>1},
-# 	'Install LibreOffice' => 						{'student'=>1, 'staff'=>0, 'server'=>0, 'james'=>1},
-# 	'Install MeshLab' => 							{'student'=>1, 'staff'=>0, 'server'=>0, 'james'=>1},
-# 	'Install Numbers' => 							{'student'=>1, 'staff'=>0, 'server'=>0, 'james'=>1},
-# 	'Install Pages' => 								{'student'=>1, 'staff'=>0, 'server'=>0, 'james'=>1},
-# 	'Install Sublime Text' => 						{'student'=>1, 'staff'=>0, 'server'=>0, 'james'=>1},
-# 	'Install VLC' => 								{'student'=>1, 'staff'=>0, 'server'=>0, 'james'=>1},
-# 	'Install Xcode' => 								{'student'=>1, 'staff'=>0, 'server'=>0, 'james'=>1},
-# 	'Install XQuartz' => 							{'student'=>1, 'staff'=>0, 'server'=>0, 'james'=>1},
-# 	'Install BoxDrive' => 							{'student'=>1, 'staff'=>1, 'server'=>0, 'james'=>1},
-# 	'Install Dropbox' => 							{'student'=>1, 'staff'=>1, 'server'=>0, 'james'=>1},
-# 	'Install Firefox' => 							{'student'=>1, 'staff'=>1, 'server'=>0, 'james'=>1},
-# 	'Install HP Printer Drivers' => 				{'student'=>1, 'staff'=>1, 'server'=>0, 'james'=>1},
-# 	'Install Microsoft Office 2019' => 				{'student'=>1, 'staff'=>1, 'server'=>0, 'james'=>1},
-# 	'Install QuickTime 7' => 						{'student'=>1, 'staff'=>1, 'server'=>0, 'james'=>1},
-# 	'Install Skype' => 								{'student'=>1, 'staff'=>1, 'server'=>0, 'james'=>1},
-# 	'Install TeamViewer' => 						{'student'=>1, 'staff'=>1, 'server'=>0, 'james'=>1},
-# 	'Install XMenu' => 								{'student'=>1, 'staff'=>1, 'server'=>0, 'james'=>1},
-# 	'Install Zoom' => 								{'student'=>1, 'staff'=>1, 'server'=>0, 'james'=>1},
-# 	'Install Novabench' => 							{'student'=>1, 'staff'=>1, 'server'=>1, 'james'=>1},
-# 	'Install BBEdit' => 							{'student'=>1, 'staff'=>1, 'server'=>1, 'james'=>1},
-# 	'Install Carbon Copy Cloner' => 				{'student'=>1, 'staff'=>1, 'server'=>1, 'james'=>1},
-#
-# 	'Install iTerm2' => 							{'student'=>1, 'staff'=>1, 'server'=>1, 'james'=>1},
-# 	'Install Radmind' => 							{'student'=>1, 'staff'=>1, 'server'=>1, 'james'=>1},
-# 	'Install 1Password' => 	 						{'student'=>0, 'staff'=>1, 'server'=>0, 'james'=>1},
-# 	'Install Adobe CC 2019' => 						{'student'=>0, 'staff'=>1, 'server'=>0, 'james'=>1},
-# 	'Install Arq' => 								{'student'=>0, 'staff'=>1, 'server'=>0, 'james'=>1},
-# 	'Install Microsoft Remote Desktop' => 			{'student'=>0, 'staff'=>1, 'server'=>0, 'james'=>1},
-# 	'Install Thunderbird' => 						{'student'=>0, 'staff'=>1, 'server'=>0, 'james'=>1},
-# 	'Install TNEFs Enough' => 						{'student'=>0, 'staff'=>1, 'server'=>0, 'james'=>1},
-# 	'Install VMware Fusion' => 						{'student'=>0, 'staff'=>1, 'server'=>0, 'james'=>1},
-#
-# ################################################################################################
-# # James only
-#
-# 	'Install GrandPerspective' => 					{'student'=>0, 'staff'=>0, 'server'=>0, 'james'=>1},
-# 	'Install Sassafras KeyConfigure K2 Admin' => 	{'student'=>0, 'staff'=>0, 'server'=>0, 'james'=>1},
-# 	'Install SoundFlower' => 						{'student'=>0, 'staff'=>0, 'server'=>0, 'james'=>1},
-# 	'Install Suspicious Package' => 				{'student'=>0, 'staff'=>0, 'server'=>0, 'james'=>1},
-# 	'Install VirtualBox' => 						{'student'=>0, 'staff'=>0, 'server'=>0, 'james'=>1},
-# 	'Install Wireshark' => 							{'student'=>0, 'staff'=>0, 'server'=>0, 'james'=>1},
-# 	'Install Zenmap' => 							{'student'=>0, 'staff'=>0, 'server'=>0, 'james'=>1},
-# #	'Install VMware Tools' => 						{'student'=>0, 'staff'=>0, 'server'=>0, 'james'=>0},
-
-	fi
-	if [[ "$COMPUTER_TYPE" == "WorkMacVM" ]]; then
-		echo "Running Homebrew"
-		brew_formulae='
-			tap "homebrew/bundle"
-			tap "homebrew/cask"
-			tap "homebrew/core"
-
-			brew "ansible"
-			brew "micro"
-			brew "python3"
-			brew "s3cmd"
-			brew "zsh"
-
-			cask "brave-browser"
-			cask "grandperspective"
-		'
 	fi
 
-	if [[ "$COMPUTER_TYPE" == "PersonalMac" ]]; then
-		echo "Running Homebrew"
-		brew_formulae='
-			tap "homebrew/bundle"
-			tap "homebrew/cask"
-			tap "homebrew/core"
+	if [[ "$COMPUTER_TYPE" == "Personal" ]]; then
+		if [ "$HARDWARE_TYPE" == "BareMetal" ]; then
+			brew_formulae='
+				tap "homebrew/bundle"
+				tap "homebrew/cask"
+				tap "homebrew/core"
 
-			brew "python3"
-			brew "webp"
-			brew "wget"
-			brew "wumpus"
-			brew "youtube-dl"
-			brew "zsh"
-			cask "bbedit"
-			cask "brave-browser"
-			cask "docker"
-			cask "dropbox"
-			cask "firefox"
-			cask "go2shell"
-			cask "grandperspective"
-			cask "iterm2"
-			cask "suspicious-package"
-			cask "textadept"
-			cask "virtualbox"
-			cask "vlc"
-			cask "wireshark"
-			cask "xquartz"
-			cask "zenmap"
-			cask "zoom"
-			mas "com.alice.mac.GetPlainText", id: 508368068
-			mas "Numbers", id: 409203825
-			mas "Slack", id: 803453959
-			mas "The Unarchiver", id: 425424353
-			mas "VOX", id: 461369673
-			mas "Xcode", id: 497799835
-			mas "WiFi Explorer Lite", id: 1408727408
+				brew "minetest"
+				brew "python3"
+				brew "webp"
+				brew "wget"
+				brew "wumpus"
+				brew "youtube-dl"
+				brew "zsh"
 
-			brew "minetest"
-# 			brew "freeciv"
-# 			brew "pacman4console"
-# 			brew "trader" # Old game
-# 			brew "tty-solitaire"
-			cask "blender"
-			cask "freeorion"
-# 			cask "mame"
-# 			cask "milkytracker"
-			cask "musescore"
-# 			cask "nestopia"
-# 			cask "openaudible"
-# 			cask "scribus"
-# 			cask "virtualc64"
-			mas "GarageBand", id: 682658836
-# 			mas "BlockheadsServer", id: 662633568
-		'
+				cask "bbedit"
+				cask "brave-browser"
+				cask "docker"
+				cask "dropbox"
+				cask "firefox"
+				cask "freeorion"
+				cask "go2shell"
+				cask "grandperspective"
+				cask "iterm2"
+				cask "musescore"
+				cask "suspicious-package"
+				cask "textadept"
+				cask "virtualbox"
+				cask "vlc"
+				cask "wireshark"
+				cask "xquartz"
+				cask "zenmap"
+				cask "zoom"
 
-# Audacity, ZeroBraneStudio, Deflemask, radmind & atari 800, other emulators, unknown-horizons
+				mas "com.alice.mac.GetPlainText", id: 508368068
+				mas "GarageBand", id: 682658836
+				mas "Numbers", id: 409203825
+				mas "Slack", id: 803453959
+				mas "The Unarchiver", id: 425424353
+				mas "VOX", id: 461369673
+				mas "WiFi Explorer Lite", id: 1408727408
+				mas "Xcode", id: 497799835
+			'
+# 				brew "freeciv"
+# 				brew "pacman4console"
+# 				brew "trader" # Old game
+# 				brew "tty-solitaire"
+# 				cask "blender"
+# 				cask "mame"
+# 				cask "milkytracker"
+# 				cask "nestopia"
+# 				cask "openaudible"
+# 				cask "scribus"
+# 				cask "virtualc64"
+# 				mas "BlockheadsServer", id: 662633568
+# 		Audacity, ZeroBraneStudio, Deflemask, atari 800, other emulators, unknown-horizons
 
+		fi
+		if [ "$HARDWARE_TYPE" == "VM" ]; then
+			brew_formulae='
+				tap "homebrew/bundle"
+				tap "homebrew/cask"
+				tap "homebrew/core"
+
+				brew "python3"
+				brew "webp"
+				brew "wget"
+				brew "youtube-dl"
+				brew "zsh"
+
+				cask "bbedit"
+				cask "brave-browser"
+				cask "dropbox"
+				cask "go2shell"
+				cask "grandperspective"
+
+				mas "com.alice.mac.GetPlainText", id: 508368068
+				mas "Numbers", id: 409203825
+			'
+		fi
 	fi
 
+	echo "Running Homebrew"
 	echo "$brew_formulae" | brew bundle install --file=-
 	brew cleanup
 	brew doctor --verbose
@@ -385,18 +387,17 @@ if [[ "$UNAME" == "Darwin" ]]; then
 
 	echo
 	echo "-------------------------------------------------"
-
-	if [[ "$COMPUTER_TYPE" == "WorkMac" ]]; then
-		echo
+	echo
+	echo "TODO:"
+	if [[ "$COMPUTER_TYPE" == "Work" ]]; then
 		echo "Remote Desktop grant non-admin rights, and remote desktop remote usage"
 		echo "Install AnyConnect, Adobe CC, Office"
-		echo
 	fi
-
 	echo "Set go2shell default to iTerm2 and ls -al to command."
 	echo "Fix iTerm2's home, end, page up, page down, cmd-arrow keys."
 
-elif [[ "$UNAME" == "Linux" ]]; then
+fi
+if [[ "$UNAME" == "Linux" ]]; then
 
 	# Dropbox
 	#https://www.dropbox.com/install-linux
