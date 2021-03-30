@@ -14,7 +14,7 @@ Brand new Mac
 - Login as non-admin account
 - Run this
 
-	curl -L https://github.com/magnusviri/dotfiles/blob/master/.dotfiles/install.sh | bash
+	curl -L https://raw.githubusercontent.com/magnusviri/dotfiles/master/.dotfiles/install.sh | bash
 
 - Install Xcode when asked
 - Edit stuff
