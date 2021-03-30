@@ -1,6 +1,8 @@
 # This runs after .zshenv
 
-cat "${HOME}/.textart/"*
+# Prompt
+# export PS1="%n@%m:%d@%*$ "
+export PS1="%F{white}<%F{yellow}%n%F{white}@%F{green}%m%F{white}:%F{magenta}%~%F{white}|%F{cyan}%F{white}%F{cyan}%*%F{white}>%f "
 
 source ~/.bash_profile
 
@@ -31,34 +33,6 @@ setopt AUTO_CD
 # Makes esc-del work right
 WORDCHARS='~!#$%^&*(){}[]<>?.+;-'
 
-# Prompt
-#export PS1="%n@%m:%d@%*$ "
-export PS1="%F{white}<%F{yellow}%n%F{white}@%F{green}%m%F{white}:%F{magenta}%~%F{white}|%F{cyan}%F{white}%F{cyan}%*%F{white}>%f "
-
-########
-# My customizations
-
-nvm use v14.15.1
-
-alias ard='echo sudo /System/Library/CoreServices/RemoteManagement/ARDAgent.app/Contents/Resources/kickstart -restart -agent'
-alias extractAudio='ffmpeg -i \!:1 -vn -acodec copy \!:2'
-alias icns2png='sips -s format png \!:1 --out \!:2'
-alias npm6="nvm use v14.15.1"
-
-alias 'cat'='bat'
-alias curl='http'
-alias man='tldr'
-alias nano='micro'
-alias pico='micro'
-alias ping='prettyping'
-alias top='glances'
-
-echo "My aliases: ard extractAudio icns2png npm6"
-echo "Replaced: cat curl man nano pico ping top"
-echo "Extras: asciinema catimg lolcat neofetch nnn prettier socat svg2png svg2icns tmux webp wget wumpus"
-
-export PATH="/usr/local/sbin:$PATH"
-
 ########
 # 3rd party
 
@@ -68,5 +42,45 @@ test -e /usr/local/vic/autocomplete/zsh/vic-machine-darwin && source /usr/local/
 ########
 # Adobe will never be my cloud storage...
 
-test -e "${HOME}/Creative Cloud Files/Icon$'\r'" && rmdir "${HOME}/Creative Cloud Files/Icon$'\r'" || true
-test -e "${HOME}/Creative Cloud Files" && rmdir "${HOME}/Creative Cloud Files" || true
+test -e "${HOME}/Creative Cloud Files" && rm "${HOME}/Creative Cloud Files/Icon"* && rmdir "${HOME}/Creative Cloud Files" || true
+
+########
+# nnn
+
+source ~/.dotfiles/quitcd.bash_zsh
+alias 'nnn'='n'
+
+########
+# My customizations
+
+#nvm use v14.15.1
+
+alias 'ard'='echo sudo /System/Library/CoreServices/RemoteManagement/ARDAgent.app/Contents/Resources/kickstart -restart -agent'
+alias 'extractAudio'='ffmpeg -i \!:1 -vn -acodec copy \!:2'
+alias 'icns2png'='sips -s format png \!:1 --out \!:2'
+alias 'npm6'='nvm use v14.15.1'
+
+alias 'cat'='echo bat /bin/cat'
+alias 'curl'='echo http /usr/bin/curl'
+alias 'man'='echo tldr /usr/bin/man'
+alias 'nano'='echo micro /usr/bin/nano'
+alias 'pico'='echo micro /usr/bin/pico'
+alias 'ping'='echo prettyping /sbin/ping'
+alias 'top'='echo glances /usr/local/bin/htop /usr/bin/top'
+alias 'reboot'='echo fdesetup authrestart /sbin/reboot'
+
+# Laravel dev
+#alias 'artisan'='docker-compose run --rm artisan'
+#alias 'composer'='docker-compose run --rm composer'
+#alias 'npm'='docker-compose run --rm npm'
+
+alias
+
+/bin/cat "${HOME}/.textart/"*
+echo "\033[0m"
+
+################################################################################
+lolcat << EOF
+asciinema ard catimg extractAudio icns2png lolcat neofetch nnn npm6 prettier
+socat svg2png svg2icns tmux webp wget wumpus - 
+EOF

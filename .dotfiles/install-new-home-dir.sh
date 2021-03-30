@@ -4,6 +4,8 @@ set -u
 
 # See https://github.com/magnusviri/dotfiles for instructions
 
+WHICH_USER=`whoami`
+
 if [ ! -e "$HOME/.env" ]; then
 	echo Please create "$HOME/.env", see https://github.com/magnusviri/dotfiles for instructions.
 	exit 1
@@ -11,16 +13,9 @@ fi
 
 source "$HOME/.env"
 
-NAME="James Reynolds"
-EMAIL="magnusviri@me.com"
-COMPUTER_NAME="Dad's Computer"
-ADMIN_ACCOUNT="james"
-PERSONAL_ACCOUNT="jeng"
-WORK_ACCOUNT="u0076374"
+UNAME="$(uname)"
 
-uname="$(uname)"
-
-if [[ "$uname" == "Darwin" ]]; then
+if [[ "$UNAME" == "Darwin" ]]; then
 
 	if [ -e /usr/local/bin/mak.py ]; then
 
@@ -75,8 +70,18 @@ if [[ "$uname" == "Darwin" ]]; then
 		chsh -s /usr/local/bin/zsh
 	fi
 
-	git config --global user.name "$NAME"
-	git config --global user.email "$EMAIL"
+	if [ "$GITHUB_NAME" != "" ]; then
+		git config --global user.name "$GITHUB_NAME"
+	else
+		echo "GITHUB_NAME was not set {git config --global user.name "\$GITHUB_NAME"}"
+	fi
+
+	if [ "$GITHUB_EMAIL" != "" ]; then
+		git config --global user.email "$GITHUB_EMAIL"
+	else
+		echo "GITHUB_EMAIL was not set (git config --global user.email "\$GITHUB_EMAIL")"
+	fi
+
 	#git config --global core.excludesfile ~/.gitignore_global
 
 	echo "Don't forget to fix .ssh/config"
@@ -89,7 +94,7 @@ if [[ "$uname" == "Darwin" ]]; then
 	# Ignore Catalina
 	softwareupdate --ignore "macOS Catalina"
 
-elif [[ "$uname" == "Linux" ]]; then
+elif [[ "$UNAME" == "Linux" ]]; then
 
 	if [ ! -e ~/.ssh ]; then
 		mkdir ~/.ssh
@@ -97,8 +102,17 @@ elif [[ "$uname" == "Linux" ]]; then
 	chown -R james:james .ssh/
 	chmod -R go-rwx .ssh/
 
-	git config --global user.name "$NAME"
-	git config --global user.email "$EMAIL"
+	if [ "$GITHUB_NAME" != "" ]; then
+		git config --global user.name "$GITHUB_NAME"
+	else
+		echo "GITHUB_NAME was not set {git config --global user.name "\$GITHUB_NAME"}"
+	fi
+
+	if [ "$GITHUB_EMAIL" != "" ]; then
+		git config --global user.email "$GITHUB_EMAIL"
+	else
+		echo "GITHUB_EMAIL was not set (git config --global user.email "\$GITHUB_EMAIL")"
+	fi
 
 	echo "edit ~/.ssh/authorized_keys"
 fi
